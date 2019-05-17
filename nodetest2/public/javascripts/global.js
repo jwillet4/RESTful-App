@@ -37,6 +37,7 @@ function populateTable() {
       tableContent += '<td><a href="#" class="linkshowuser" rel="' + this.username + '">' + this.username + '</a></td>';
       tableContent += '<td>' + this.email + '</td>';
       tableContent += '<td><a href="#" class="linkdeleteuser" rel="' + this._id + '">delete</a></td>';
+      tableContent += '<td><a href="#" class="linkupdateuser" rel="' + this._id + '">update</a></td>';
       tableContent += '</tr>';
     });
 
