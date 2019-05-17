@@ -12,6 +12,9 @@ $(document).ready(function() {
 
   //Add user button click
   $('#btnAddUser').on('click', addUser);
+
+  //Delete user link click
+  $('#userList table tbody').on('click', 'td a.linkdeleteuser', deleteUser);
 });
 
 // Functions =============================================================
@@ -64,7 +67,7 @@ function showUserInfo(event) {
 };
 
 //Add user
-function.addUser(event) {
+function addUser(event) {
   event.preventDefault();
 
   //Basic validation - Increases errorCount if any fields are blank
@@ -77,12 +80,12 @@ function.addUser(event) {
   if (errorCount === 0) {
     //If there are no blank fields, compile all data into one object
     var newUser = {
-      'username': $('#addUser fieldset input#inputUserName').val();
-      'email': $('#addUser fieldset input#inputUserEmail').val();
-      'fullname': $('#addUser fieldset input#inputUserFullname').val();
-      'age': $('#addUser fieldset input#inputUserAge').val();
-      'location': $('#addUser fieldset input#inputUserLocation).val();
-      'gender': $('#addUser fieldset input#inputUserGender').val();
+      'username': $('#addUser fieldset input#inputUserName').val(),
+      'email': $('#addUser fieldset input#inputUserEmail').val(),
+      'fullname': $('#addUser fieldset input#inputUserFullname').val(),
+      'age': $('#addUser fieldset input#inputUserAge').val(),
+      'location': $('#addUser fieldset input#inputUserLocation').val(),
+      'gender': $('#addUser fieldset input#inputUserGender').val()
     }
 
     //Use AJAX to post the object to the adduser service
@@ -108,5 +111,30 @@ function.addUser(event) {
     //If errorCount is more than 0, error out
     alert('Please fill in all fields');
     return false;
+  }
+};
+
+//Delete user
+function deleteUser(event) {
+  event.preventDefault();
+  //Confirmation dialog
+  var confirmation = confirm('Are you sure you wish to delete this user?');
+  //Check for user confirmation
+  if (confirmation === true) {
+    //If confirmed, DELETE user
+    $.ajax({
+      type: 'DELETE',
+      url: '/users/deleteuser/' + $(this).attr('rel')
+    }).done(function( response ) {
+      //Check for blank response
+      if (response.msg === '') {
+        alert('User deleted.')
+      }
+      else {
+        alert('Error: ' + response.msg);
+      }
+      //Populate table
+      populateTable();
+    });
   }
 };
