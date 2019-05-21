@@ -15,6 +15,9 @@ $(document).ready(function() {
 
   //Delete user link click
   $('#userList table tbody').on('click', 'td a.linkdeleteuser', deleteUser);
+
+  //Update use link click
+  $('#userList table tbody').on('click', 'td a.linkupdateuser', addUpdateForm);
 });
 
 // Functions =============================================================
@@ -139,3 +142,33 @@ function deleteUser(event) {
     });
   }
 };
+
+function addUpdateForm(event) {
+  event.preventDefault();
+  //Confirmation dialog
+  var confirmation = confirm('Are you sure you want to update this user?');
+  //Checks for user confirmation
+  if (confirmation === true) {
+    //Retrieves username
+    var thisUserName = $(this).attr('rel');
+    var arrayPosition = userListData.map(function(arrayItem) { return arrayItem._id; }).indexOf(thisUserName);
+    //Gets the user object
+    var thisUserObject = userListData[arrayPosition];
+    console.log(thisUserObject);
+    var changeForm = '';
+
+    changeForm += '<h2>Please Update the Information Below<h2>';
+    changeForm += '<input type = "text" name = "inputUserName" value = "' + thisUserObject.username + '">';
+    changeForm += '<input type = "text" name = "inputUserEmail" value = "' + thisUserObject.email + '"><br>';
+    changeForm += '<input type = "text" name = "inputUserFullname" value = "' + thisUserObject.fullname + '">';
+    changeForm += '<input type = "text" name = "inputUserAge" value = "' + thisUserObject.age + '"><br>';
+    changeForm += '<input type = "text" name = "inputUserLocation" value = "' + thisUserObject.location + '">';
+    changeForm += '<input type = "text" name = "inputUserGender" value = "' + thisUserObject.gender + '"><br>';
+    changeForm += '<button type "button name = btnUpdateUser">Update User</button>';
+
+    $('#updateForm').html(changeForm);
+      
+  }
+};
+
+
