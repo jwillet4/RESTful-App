@@ -29,26 +29,13 @@ router.delete('/deleteuser/:id', function(req, res) {
   });
 });
 
-//PUT to changeuser
-router.put('/updateuser/:id', function(req, res) {
+//POST to changeuser
+router.post('/updateuser/:id', function(req, res) {
   var db = req.db;
   var collection = db.get('userlist');
-  var userToUpdate = req.params.id;
-  
-
-
-
-
-
-
-  //Possibly just activate addUpdateForm then have seperate button in form send the put and clear update form
-  
-  //collection.update({ '_id' : userToUpdate }, function() {
-    //Add code through global that inserts an update field
-    //That form value is returned and updated in database
-  //}, function(err) {
-    //Add error message here
-  //});
+  collection.update({ id : req.body.id }, req.body, function(err) {
+    res.send((err === null) ? {msg : '' } : {msg:'error ' + err });
+  });
 });
 
 module.exports = router;

@@ -1,5 +1,8 @@
+//Author: Logan the Spaghetti King
+
 // Userlist data array for filling in info box
 var userListData = [];
+var updateID = '';
 
 // DOM Ready =============================================================
 $(document).ready(function() {
@@ -16,8 +19,10 @@ $(document).ready(function() {
   //Delete user link click
   $('#userList table tbody').on('click', 'td a.linkdeleteuser', deleteUser);
 
-  //Update use link click
+  //Update form link click
   $('#userList table tbody').on('click', 'td a.linkupdateuser', addUpdateForm);
+
+  
 });
 
 // Functions =============================================================
@@ -62,7 +67,6 @@ function showUserInfo(event) {
 
   //Gets the user object
   var thisUserObject = userListData[arrayPosition];
-
   //Populates the info box
   $('#userInfoName').text(thisUserObject.fullname);
   $('#userInfoAge').text(thisUserObject.age);
@@ -150,25 +154,70 @@ function addUpdateForm(event) {
   //Checks for user confirmation
   if (confirmation === true) {
     //Retrieves username
-    var thisUserName = $(this).attr('rel');
+    var thisUserName = updateID = $(this).attr('rel');
     var arrayPosition = userListData.map(function(arrayItem) { return arrayItem._id; }).indexOf(thisUserName);
     //Gets the user object
     var thisUserObject = userListData[arrayPosition];
-    console.log(thisUserObject);
+    //String of HTML to be inserted into the webpage
     var changeForm = '';
-
+    //Add form markup
     changeForm += '<h2>Please Update the Information Below<h2>';
-    changeForm += '<input type = "text" name = "inputUserName" value = "' + thisUserObject.username + '">';
-    changeForm += '<input type = "text" name = "inputUserEmail" value = "' + thisUserObject.email + '"><br>';
-    changeForm += '<input type = "text" name = "inputUserFullname" value = "' + thisUserObject.fullname + '">';
-    changeForm += '<input type = "text" name = "inputUserAge" value = "' + thisUserObject.age + '"><br>';
-    changeForm += '<input type = "text" name = "inputUserLocation" value = "' + thisUserObject.location + '">';
-    changeForm += '<input type = "text" name = "inputUserGender" value = "' + thisUserObject.gender + '"><br>';
-    changeForm += '<button type "button name = btnUpdateUser">Update User</button>';
-
+    changeForm += '<div id="updateForm"><fieldset><input type = "text" placeholder = "Username" id = "inputUserName" value = "' + thisUserObject.username + '">';
+    changeForm += '<input type = "text" placeholder = "Full Name" id = "inputUserFullname" value = "' + thisUserObject.fullname + '"><br>';
+    changeForm += '<input type = "text" placeholder = "Email" id = "inputUserEmail" value = "' + thisUserObject.email + '">';
+    changeForm += '<input type = "text" placeholder = "Age" id = "inputUserAge" value = "' + thisUserObject.age + '"><br>';
+    changeForm += '<input type = "text" placeholder = "Location" id = "inputUserLocation" value = "' + thisUserObject.location + '">';
+    changeForm += '<input type = "text" placeholder = "Gender" id = "inputUserGender" value = "' + thisUserObject.gender + '"><br>';
+    changeForm += '<button type = "button" id ="btnUpdateUser">Update User</button></fieldset></div>';
+    //Inserts the form
     $('#updateForm').html(changeForm);
-      
+    //Update user link click
+    $('#btnUpdateUser').on('click', updateUser);
+    console.log(updateID);
   }
 };
 
-
+function updateUser(event) {
+  event.preventDefault();
+  //error counter to check for empty fields
+  var errorCount = 0;
+  $('#updateForm input').each(function(index, val) {
+    if($(this).val() === '') { errorCount++ }
+  });
+  //executes update if fields are all populated
+  if (errorCount === 0) {
+    var updatedUser = {
+      '_id': updateID,
+      'username': $('#inputUserName').val(),
+      'email': $('#inputUserEmail').val(),
+      'fullname': $('#inputUserFullname').val(),
+      'age': $('#inputUserAge').val(),
+      'location': $('#inputUserLocation').val(),
+      'gender': $('#inputUserGender').val()
+    }
+    //POST updated user information
+    $.ajax({
+      url: 'users/updateuser/' + updateID,
+      type: 'POST',
+      data: updatedUser,
+      dataType: 'JSON'
+    }).done(function( response ) {
+      //Check for blank response (successful)
+      if (response.msg === '') {
+        //Clear form inputs
+        $('#addUser fieldset input').val('');
+        //Update the table
+        populateTable();
+        //Clears update form
+        $('#updateForm').html('');
+      }
+      else
+        alert('Error: ' + response.msg);
+    });
+  }
+  else {
+    //If errorCount is more than 0, error out
+    alert('Please fill in all fields');
+    return false;
+  }
+};
